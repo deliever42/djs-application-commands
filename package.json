@@ -1,0 +1,36 @@
+{
+    "name": "discord.js-new-application-commands",
+    "version": "1.0.0",
+    "description": "A module for Discord's new app commands, it can be used with Discord.JS",
+    "main": "dist/index.js",
+    "scripts": {
+        "test": "node dist/test/index.js",
+        "build": "tsc"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/deliever42/discord.js-new-application-commands.git"
+    },
+    "keywords": [
+        "discord.js",
+        "discord",
+        "ws",
+        "api",
+        "discord-slash-commands",
+        "discord-application-commands"
+    ],
+    "author": "deliever42",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/deliever42/discord.js-new-application-commands/issues"
+    },
+    "homepage": "https://github.com/deliever42/discord.js-new-application-commands#readme",
+    "dependencies": {
+        "@discordjs/rest": "^0.4.1",
+        "discord.js": "^13.6.0"
+    },
+    "devDependencies": {
+        "prettierrc": "^0.0.0-5",
+        "typescript": "^4.6.4"
+    }
+}
