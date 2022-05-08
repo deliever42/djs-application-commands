@@ -40,7 +40,7 @@ export class ApplicationCommandManager {
                 required: option.required ?? false,
                 choices: [],
                 options: option.options ? this.resolveCommandOptions(option.options) : [],
-                channel_types: [],
+                channel_types: option.channelTypes ? option.channelTypes.map((type) => ChannelTypes[type]) as number[] : null,
                 min_value: option.minValue ?? null,
                 max_value: option.maxValue ?? null,
                 autocomplete: option.autocomplete ?? false
