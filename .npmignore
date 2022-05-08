@@ -1,4 +1,4 @@
-.prettierrc.json
+.prettierrc.js
 .npmrc
 node_modules
 dist/test
