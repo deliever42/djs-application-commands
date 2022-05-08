@@ -1,0 +1,6 @@
+.prettierrc.json
+.npmrc
+node_modules
+dist/test
+test
+src
