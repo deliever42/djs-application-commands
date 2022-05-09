@@ -1,4 +1,4 @@
-import { Permissions, type Snowflake, type RawApplicationCommandOptionChoiceData, type ApplicationCommandOptionChoiceData, type ApplicationCommandData, type RawApplicationCommandOptionData, type RawApplicationCommandData, ApplicationCommandTypes, type ApplicationCommandOptionData, ApplicationCommandOptionTypes, ChannelTypes } from "../index"
+import { type ApplicationCommandEditData, Permissions, type Snowflake, type RawApplicationCommandOptionChoiceData, type ApplicationCommandOptionChoiceData, type ApplicationCommandData, type RawApplicationCommandOptionData, type RawApplicationCommandData, ApplicationCommandTypes, type ApplicationCommandOptionData, ApplicationCommandOptionTypes, ChannelTypes, ApplicationCommandManager } from "../index"
 import type { Client } from "discord.js"
 
 export class ApplicationCommand {
@@ -15,9 +15,11 @@ export class ApplicationCommand {
     public type!: keyof typeof ApplicationCommandTypes
     public version!: string
     public options!: ApplicationCommandOptionData[]
-    public constructor(client: Client, data: RawApplicationCommandData) {
+    public manager: ApplicationCommandManager
+    public constructor(client: Client, data: RawApplicationCommandData, manager: ApplicationCommandManager) {
         this.id = data.id
         this.client = client
+        this.manager = manager
 
         this._patch(data)
     }
@@ -34,6 +36,72 @@ export class ApplicationCommand {
         this.type = data.type ? ApplicationCommandTypes[data.type] as keyof typeof ApplicationCommandTypes : "SLASH_COMMAND"
         this.version = data.version
         this.options = data.options ? this.resolveCommandOptions(data.options, "mod") as ApplicationCommandOptionData[] : []
+    }
+
+    public async delete() {
+        const route: `/${string}` = !this.guildId ? `/applications/${this.client.application!.id}/commands/${this.name}` : `/applications/${this.client.application!.id}/guilds/${this.guildId}/commands/${this.name}`
+
+        await this.manager.rest.delete(route)
+
+        this.manager.cache.delete(this.name)
+
+        return
+    }
+
+    public async edit(data: ApplicationCommandEditData) {
+        const route: `/${string}` = !this.guildId ? `/applications/${this.client.application!.id}/commands/${this.name}` : `/applications/${this.client.application!.id}/guilds/${this.guildId}/commands/${this.name}`
+        const resolvedData = this.resolveCommand(data as any)
+        const command = await this.manager.rest.patch(route, { body: { ...resolvedData } })
+
+        this._patch(command as any)
+
+        this.manager.cache.set(this.name, this)
+
+        return this
+    }
+
+    public async fetch() {
+        const route: `/${string}` = !this.guildId ? `/applications/${this.client.application!.id}/commands/${this.name}` : `/applications/${this.client.application!.id}/guilds/${this.guildId}/commands/${this.name}`
+        const resolvedData = this.resolveCommand(this as any)
+        const command = await this.manager.rest.get(route, { body: { ...resolvedData } })
+
+        this._patch(command as any)
+
+        this.manager.cache.set(this.name, this)
+
+        return this
+    }
+
+    public async setName(newName: string) {
+        return await this.edit({ name: newName })
+    }
+
+    public async setNameLocalizations(localizations: { [locale: string]: string }) {
+        return await this.edit({
+            nameLocalizations: localizations
+        })
+    }
+
+    public async setDescription(description: string) {
+        return await this.edit({ description })
+    }
+
+    public async setDescriptionLocalizations(localizations: { [locale: string]: string }) {
+        return await this.edit({
+            descriptionLocalizations: localizations
+        })
+    }
+
+    public async setOptions(options: ApplicationCommandOptionData[]) {
+        return await this.edit({ options })
+    }
+
+    public async setPermissions(permissions: keyof typeof Permissions | (keyof typeof Permissions)[]) {
+        return await this.edit({ permissions })
+    }
+
+    public async setGlobal(global: boolean) {
+        return await this.edit({ global })
     }
 
     private resolveCommandOptionChoices(choices: ApplicationCommandOptionChoiceData[] | RawApplicationCommandOptionChoiceData[], to: "mod" | "raw") {
@@ -115,7 +183,7 @@ export class ApplicationCommand {
             description: command.description ? type !== 1 ? null : command.description : null,
             description_localizations: command.descriptionLocalizations ?? {},
             type,
-            options: command.options ? type !== 1 ? null : this.resolveCommandOptions(command.options, "raw") : null,
+            options: command.options ? type !== 1 ? null : this.resolveCommandOptions(command.options, "raw") : [],
             default_member_permissions: command.permissions ? this.resolvePermissions(command.permissions) : "0",
             dm_permission: command.global ?? false,
             guild_id: command.guildId ?? null

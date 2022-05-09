@@ -25,16 +25,13 @@ export class ApplicationCommandManager extends CachedManager<string, Application
             resolvedCommands.push(this.resolveCommand(command))
         }
 
-        const route: `/${string}` = guildId ? `/applications/${this.client.user!.id}/guilds/${guildId}/commands` : `/applications/${this.client.user!.id}/commands`
-
+        const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands`
 
         await this.rest.put(route, {
             body: {
                 commands: resolvedCommands
             }
         })
-
-        this.cache.clear()
 
         for (const command of resolvedCommands) {
             this.cache.set(command.name, command as any)
@@ -46,7 +43,7 @@ export class ApplicationCommandManager extends CachedManager<string, Application
     public async create(command: ApplicationCommandData, guildId?: Snowflake) {
         const resolvedCommand = this.resolveCommand(command)
 
-        const route: `/${string}` = guildId ? `/applications/${this.client.user!.id}/commands` : `/applications/${this.client.user!.id}/guilds/${guildId}/commands`
+        const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands`
 
 
         const data = await this.rest.post(route, {
@@ -63,7 +60,7 @@ export class ApplicationCommandManager extends CachedManager<string, Application
     }
 
     public async delete(commandName: string, guildId?: Snowflake) {
-        const route: `/${string}` = guildId ? `/applications/${this.client.user!.id}/commands/${commandName}` : `/applications/${this.client.user!.id}/guilds/${guildId}/commands/${commandName}`
+        const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands/${commandName}` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands/${commandName}`
 
 
         await this.rest.delete(route)
@@ -73,7 +70,7 @@ export class ApplicationCommandManager extends CachedManager<string, Application
     }
 
     public async edit(commandName: string, data: ApplicationCommandEditData, guildId?: Snowflake) {
-        const route: `/${string}` = guildId ? `/applications/${this.client.user!.id}/commands/${commandName}` : `/applications/${this.client.user!.id}/guilds/${guildId}/commands/${commandName}`
+        const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands/${commandName}` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands/${commandName}`
         const resolvedData = this.resolveCommand(data as any)
         const command = await this.rest.patch(route, { body: { ...resolvedData } })
         const applicationCommand = new ApplicationCommand(this.client, command as any)
@@ -84,7 +81,7 @@ export class ApplicationCommandManager extends CachedManager<string, Application
     }
 
     public async fetch(commandName?: string, guildId?: Snowflake) {
-        const route: `/${string}` = guildId ? `/applications/${this.client.user!.id}/commands/${commandName}` : `/applications/${this.client.user!.id}/guilds/${guildId}/commands/${commandName}`
+        const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands/${commandName}` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands/${commandName}`
 
 
         if (commandName) {
@@ -187,7 +184,7 @@ export class ApplicationCommandManager extends CachedManager<string, Application
             description: command.description ? type !== 1 ? null : command.description : null,
             description_localizations: command.descriptionLocalizations ?? {},
             type,
-            options: command.options ? type !== 1 ? null : this.resolveCommandOptions(command.options) : null,
+            options: command.options ? type !== 1 ? null : this.resolveCommandOptions(command.options) : [],
             default_member_permissions: command.permissions ? this.resolvePermissions(command.permissions) : "0",
             dm_permission: command.global ?? false,
             guild_id: command.guildId ?? null
