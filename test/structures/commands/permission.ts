@@ -7,7 +7,7 @@ export const data: ApplicationCommandData = {
     description: 'Permission Command',
     global: true,
     type: "SLASH_COMMAND",
-    permissions: ["ManageRoles", "ManageChannels"]
+    permissions: ["MANAGE_ROLES", "MANAGE_CHANNELS"]
 };
 
 export const run = async (client: ExtendedClient, interaction: CommandInteraction) => {

@@ -1,11 +1,10 @@
 import { Client, Collection } from 'discord.js';
-import { ApplicationCommandManager } from '../../src';
-import { CommandHandler } from './handlers/command';
+import type { ApplicationCommandManager, ApplicationCommandData } from '../../src/index';
 import { EventHandler } from './handlers/event';
 
 export class ExtendedClient extends Client {
-    public cache = { commands: new Collection<string, any>(), events: new Collection<string, any>() };
-    public applicationCommandManager: ApplicationCommandManager;
+    public cache = { commands: new Collection<string, { data: ApplicationCommandData, run: (...args: any[]) => any }>(), events: new Collection<string, { data: { name: string }, run: (...args: any[]) => any }>() };
+    public applicationCommandManager!: ApplicationCommandManager;
     public constructor(token: string) {
         super({
             intents: 32767,
@@ -13,9 +12,6 @@ export class ExtendedClient extends Client {
             shards: 'auto',
         });
 
-        this.applicationCommandManager = new ApplicationCommandManager((this as unknown) as Client);
-
-        new CommandHandler(this);
         new EventHandler(this);
 
         this.login(token);
