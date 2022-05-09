@@ -23,8 +23,8 @@ export class CommandHandler {
             client.applicationCommandManager.set(guildCommands, guildId)
         }
 
-        client.on("guildCreate", async (guild) => {
-            client.applicationCommandManager.set(guildCommands, guild.id)
+        client.on("guildCreate", async ({ id }) => {
+            client.applicationCommandManager.set(guildCommands, id)
         })
 
         client.on("interactionCreate", async (interaction) => {

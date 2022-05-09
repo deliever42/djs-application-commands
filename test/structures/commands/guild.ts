@@ -5,7 +5,6 @@ import type { ApplicationCommandData } from "../../../src/index"
 export const data: ApplicationCommandData = {
     name: 'guild',
     description: 'Guild Command',
-    global: false,
     type: "SLASH_COMMAND"
 };
 

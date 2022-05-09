@@ -5,7 +5,6 @@ import type { ApplicationCommandData } from "../../../src/index"
 export const data: ApplicationCommandData = {
     name: 'permission',
     description: 'Permission Command',
-    global: true,
     type: "SLASH_COMMAND",
     permissions: ["MANAGE_ROLES", "MANAGE_CHANNELS"]
 };
