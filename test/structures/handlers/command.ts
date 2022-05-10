@@ -34,7 +34,7 @@ export class CommandHandler {
                 await interaction.deferReply({ ephemeral: true })
 
                 if (!command) {
-                    await interaction.followUp({ content: ":x: | This command could not be found." })
+                    await interaction.followUp({ content: "This command could not be found." })
                     return
                 }
 
