@@ -9,11 +9,8 @@ export class SubcommandGroupOptionBuilder extends BaseOption {
         this.options = []
     }
 
-    public addSubcommandOption(fn: (SubcommandBuilder: SubcommandOptionBuilder) => SubcommandOptionBuilder) {
-        const option = fn(new SubcommandOptionBuilder())
-
-        this.options.push(option)
-
+    public addSubcommandOption(fn: (builder: SubcommandOptionBuilder) => SubcommandOptionBuilder) {
+        this.options.push(fn(new SubcommandOptionBuilder()))
         return this
     }
 }

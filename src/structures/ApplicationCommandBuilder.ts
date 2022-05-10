@@ -1,4 +1,4 @@
-import { Permissions, type Snowflake, type RawApplicationCommandOptionData, ApplicationCommandTypes, StringOptionBuilder } from "../index"
+import { AttachmentOptionBuilder, SubcommandGroupOptionBuilder, UserOptionBuilder, SubcommandOptionBuilder, RoleOptionBuilder, NumberOptionBuilder, BooleanOptionBuilder, ChannelOptionBuilder, IntegerOptionBuilder, MentionableOptionBuilder, Permissions, type Snowflake, type RawApplicationCommandOptionData, ApplicationCommandTypes, StringOptionBuilder } from "../index"
 
 export class ApplicationCommandBuilder {
     public name: string | null;
@@ -62,53 +62,58 @@ export class ApplicationCommandBuilder {
         return this
     }
 
-    public addSubcommandOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
+    public addUserOption(fn: (builder: UserOptionBuilder) => UserOptionBuilder) {
+        this.options.push(fn(new UserOptionBuilder()) as RawApplicationCommandOptionData)
+        return this
+    }
+
+    public addSubcommandOption(fn: (builder: SubcommandOptionBuilder) => SubcommandOptionBuilder) {
+        this.options.push(fn(new SubcommandOptionBuilder()) as RawApplicationCommandOptionData)
+        return this
+    }
+
+    public addSubcommandGroupOption(fn: (builder: SubcommandGroupOptionBuilder) => SubcommandGroupOptionBuilder) {
+        this.options.push(fn(new SubcommandGroupOptionBuilder()) as RawApplicationCommandOptionData)
+        return this
+    }
+
+    public addStringOption(fn: (builder: StringOptionBuilder) => StringOptionBuilder) {
         this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
         return this
     }
 
-    public addSubcommandGroupOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
-        this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
+    public addIntegerOption(fn: (builder: IntegerOptionBuilder) => IntegerOptionBuilder) {
+        this.options.push(fn(new IntegerOptionBuilder()) as RawApplicationCommandOptionData)
         return this
     }
 
-    public addStringOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
-        this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
+    public addBooleanOption(fn: (builder: BooleanOptionBuilder) => BooleanOptionBuilder) {
+        this.options.push(fn(new BooleanOptionBuilder()) as RawApplicationCommandOptionData)
         return this
     }
 
-    public addIntegerOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
-        this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
+    public addChannelOption(fn: (builder: ChannelOptionBuilder) => ChannelOptionBuilder) {
+        this.options.push(fn(new ChannelOptionBuilder()) as unknown as RawApplicationCommandOptionData)
         return this
     }
 
-    public addBooleanOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
-        this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
+    public addRoleOption(fn: (builder: RoleOptionBuilder) => RoleOptionBuilder) {
+        this.options.push(fn(new RoleOptionBuilder()) as RawApplicationCommandOptionData)
         return this
     }
 
-    public addChannelOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
-        this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
+    public addMentionableOption(fn: (builder: MentionableOptionBuilder) => MentionableOptionBuilder) {
+        this.options.push(fn(new MentionableOptionBuilder()) as RawApplicationCommandOptionData)
         return this
     }
 
-    public addRoleOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
-        this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
+    public addNumberOption(fn: (builder: NumberOptionBuilder) => NumberOptionBuilder) {
+        this.options.push(fn(new NumberOptionBuilder()) as RawApplicationCommandOptionData)
         return this
     }
 
-    public addMentionableOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
-        this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
-        return this
-    }
-
-    public addNumberOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
-        this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
-        return this
-    }
-
-    public addAttachmentOption(fn: (StringBuilder: StringOptionBuilder) => StringOptionBuilder) {
-        this.options.push(fn(new StringOptionBuilder()) as RawApplicationCommandOptionData)
+    public addAttachmentOption(fn: (builder: AttachmentOptionBuilder) => AttachmentOptionBuilder) {
+        this.options.push(fn(new AttachmentOptionBuilder()) as RawApplicationCommandOptionData)
         return this
     }
 
