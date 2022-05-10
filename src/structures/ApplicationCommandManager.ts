@@ -113,8 +113,8 @@ export class ApplicationCommandManager extends CachedManager<Snowflake, Applicat
         }
     }
 
-    public async setName(commandId: Snowflake, newName: string, guildId?: Snowflake) {
-        return await this.edit(commandId, { name: newName }, guildId)
+    public async setName(commandId: Snowflake, name: string, guildId?: Snowflake) {
+        return await this.edit(commandId, { name }, guildId)
     }
 
     public async setNameLocalizations(commandId: Snowflake, localizations: { [locale: string]: string }, guildId?: Snowflake) {
