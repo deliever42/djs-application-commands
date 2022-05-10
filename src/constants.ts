@@ -144,7 +144,7 @@ export interface RawApplicationCommandData {
     guild_id?: Snowflake
     name: string
     name_localizations?: { [locale: string]: string };
-    description: string
+    description?: string
     description_localizations?: { [locale: string]: string };
     options?: RawApplicationCommandOptionData[]
     default_member_permissions?: string

@@ -1,14 +1,14 @@
 import { type Client, CachedManager, type Collection } from "discord.js"
-import { Permissions, type Snowflake, type RawApplicationCommandOptionChoiceData, type RawApplicationCommandOptionData, type ApplicationCommandOptionChoiceData, type ApplicationCommandEditData, ApplicationCommand, type ApplicationCommandData, type ApplicationCommandOptionData, ApplicationCommandTypes, ApplicationCommandOptionTypes, ChannelTypes } from "../index"
+import { type RawApplicationCommandData, Permissions, type Snowflake, type RawApplicationCommandOptionChoiceData, type RawApplicationCommandOptionData, type ApplicationCommandOptionChoiceData, type ApplicationCommandEditData, ApplicationCommand, type ApplicationCommandData, type ApplicationCommandOptionData, ApplicationCommandTypes, ApplicationCommandOptionTypes, ChannelTypes } from "../index"
 import { REST } from "@discordjs/rest"
 
 declare module "discord.js" {
-    interface CachedManager<K, Holds, R> {
+    interface CachedManager<K, Holds, R = null> {
         readonly cache: Collection<K, Holds>
     }
 }
 
-export class ApplicationCommandManager extends CachedManager<string, ApplicationCommand, ApplicationCommand> {
+export class ApplicationCommandManager extends CachedManager<Snowflake, ApplicationCommand> {
     public rest: REST
     public constructor(client: Client) {
         super(client, ApplicationCommand)
@@ -18,7 +18,7 @@ export class ApplicationCommandManager extends CachedManager<string, Application
     }
 
     public async set(commands: ApplicationCommandData[], guildId?: Snowflake) {
-        const resolvedCommands = []
+        const resolvedCommands: RawApplicationCommandData[] = []
 
         for (const command of commands) {
             if (!command.guildId && !command.global) command.guildId = guildId
@@ -27,14 +27,17 @@ export class ApplicationCommandManager extends CachedManager<string, Application
 
         const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands`
 
-        await this.rest.put(route, {
-            body: {
-                commands: resolvedCommands
-            }
+        const newCommands = await this.rest.put(route, {
+            body: JSON.parse(JSON.stringify(resolvedCommands, (k, v) =>
+                typeof v === 'bigint'
+                    ? v.toString()
+                    : v
+            ))
+
         })
 
-        for (const command of resolvedCommands) {
-            this.cache.set(command.name, command as any)
+        for (const command of newCommands as any[]) {
+            this.cache.set(command.id, new ApplicationCommand(this.client, command, this))
         }
 
         return this.cache
@@ -42,9 +45,7 @@ export class ApplicationCommandManager extends CachedManager<string, Application
 
     public async create(command: ApplicationCommandData, guildId?: Snowflake) {
         const resolvedCommand = this.resolveCommand(command)
-
-        const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands`
-
+        const route: `/${string}` = command.global ? `/applications/${this.client.application!.id}/commands` : `/applications/${this.client.application!.id}/guilds/${command.guildId ?? guildId}/commands`
 
         const data = await this.rest.post(route, {
             body: {
@@ -52,91 +53,100 @@ export class ApplicationCommandManager extends CachedManager<string, Application
             }
         })
 
-        const applicationCommand = new ApplicationCommand(this.client, data as any)
+        const applicationCommand = new ApplicationCommand(this.client, data as any, this)
 
-        this.cache.set(applicationCommand.name, applicationCommand)
+        this.cache.set(applicationCommand.id, applicationCommand)
 
         return applicationCommand
     }
 
-    public async delete(commandName: string, guildId?: Snowflake) {
-        const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands/${commandName}` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands/${commandName}`
-
+    public async delete(commandId: Snowflake, guildId?: Snowflake) {
+        const command = this.cache.get(commandId)
+        const route: `/${string}` = (command === undefined || !guildId ? true : command.global) ? `/applications/${this.client.application!.id}/commands/${commandId}` : `/applications/${this.client.application!.id}/guilds/${command?.guildId ?? guildId}/commands/${commandId}`
 
         await this.rest.delete(route)
 
-        this.cache.delete(commandName)
+        this.cache.delete(commandId)
         return
     }
 
-    public async edit(commandName: string, data: ApplicationCommandEditData, guildId?: Snowflake) {
-        const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands/${commandName}` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands/${commandName}`
-        const resolvedData = this.resolveCommand(data as any)
-        const command = await this.rest.patch(route, { body: { ...resolvedData } })
-        const applicationCommand = new ApplicationCommand(this.client, command as any)
+    public async edit(commandId: Snowflake, data: ApplicationCommandEditData, guildId?: Snowflake) {
+        const command = this.cache.get(commandId)
+        const route: `/${string}` = (command === undefined || !guildId ? true : command.global) ? `/applications/${this.client.application!.id}/commands/${commandId}` : `/applications/${this.client.application!.id}/guilds/${command?.guildId ?? guildId}/commands/${commandId}`
 
-        this.cache.set(applicationCommand.name, applicationCommand)
+        if (!data.name) data.name = command?.name
+        if (!data.description && command?.description) data.description = command.description
+        if (!data.type) data.type = command?.type
+
+        console.log(data)
+
+        const resolvedData = this.resolveCommand(data as any)
+        const newData = await this.rest.patch(route, { body: { ...resolvedData } })
+        const applicationCommand = new ApplicationCommand(this.client, newData as any, this)
+
+        this.cache.set(applicationCommand.id, applicationCommand)
 
         return applicationCommand
     }
 
-    public async fetch(commandName?: string, guildId?: Snowflake) {
-        const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands/${commandName}` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands/${commandName}`
+    public async fetch(commandId?: string, guildId?: Snowflake) {
+        if (commandId) {
+            const command = this.cache.get(commandId)
+            const route: `/${string}` = (command === undefined || !guildId ? true : command.global) ? `/applications/${this.client.application!.id}/commands/${commandId}` : `/applications/${this.client.application!.id}/guilds/${command?.guildId ?? guildId}/commands/${commandId}`
 
+            const newData = await this.rest.get(route) as ApplicationCommandData
 
-        if (commandName) {
-            const command = await this.rest.get(route) as ApplicationCommandData
-
-            return new ApplicationCommand(this.client, command as any)
+            return new ApplicationCommand(this.client, newData as any, this)
 
         } else {
+            const route: `/${string}` = !guildId ? `/applications/${this.client.application!.id}/commands` : `/applications/${this.client.application!.id}/guilds/${guildId}/commands`
             const commands = await this.rest.get(route) as ApplicationCommandData[]
             const resolvedCommands = []
 
             this.cache.clear()
             for (const command of commands) {
-                const applicationCommand = new ApplicationCommand(this.client, command as any)
+                const applicationCommand = new ApplicationCommand(this.client, command as any, this)
                 resolvedCommands.push(applicationCommand)
-                this.cache.set(applicationCommand.name, applicationCommand)
+                this.cache.set(applicationCommand.id, applicationCommand)
             }
 
             return this.cache
         }
     }
 
-    public async setName(commandName: string, newName: string, guildId?: Snowflake) {
-        return await this.edit(commandName, { name: newName }, guildId)
+    public async setName(commandId: Snowflake, newName: string, guildId?: Snowflake) {
+        return await this.edit(commandId, { name: newName }, guildId)
     }
 
-    public async setNameLocalizations(commandName: string, localizations: { [locale: string]: string }, guildId?: Snowflake) {
-        return await this.edit(commandName, {
+    public async setNameLocalizations(commandId: Snowflake, localizations: { [locale: string]: string }, guildId?: Snowflake) {
+        return await this.edit(commandId, {
             nameLocalizations: localizations
         }, guildId)
     }
 
-    public async setDescription(commandName: string, description: string, guildId?: Snowflake) {
-        return await this.edit(commandName, { description }, guildId)
+    public async setDescription(commandId: Snowflake, description: string, guildId?: Snowflake) {
+        return await this.edit(commandId, { description }, guildId)
     }
 
-    public async setDescriptionLocalizations(commandName: string, localizations: { [locale: string]: string }, guildId?: Snowflake) {
-        return await this.edit(commandName, {
+    public async setDescriptionLocalizations(commandId: Snowflake, localizations: { [locale: string]: string }, guildId?: Snowflake) {
+        return await this.edit(commandId, {
             descriptionLocalizations: localizations
         }, guildId)
     }
 
-    public async setOptions(commandName: string, options: ApplicationCommandOptionData[], guildId?: Snowflake) {
-        return await this.edit(commandName, { options }, guildId)
+    public async setOptions(commandId: Snowflake, options: ApplicationCommandOptionData[], guildId?: Snowflake) {
+        return await this.edit(commandId, { options }, guildId)
     }
 
-    public async setPermissions(commandName: string, permissions: keyof typeof Permissions | (keyof typeof Permissions)[], guildId?: Snowflake) {
-        return await this.edit(commandName, { permissions }, guildId)
+    public async setPermissions(commandId: Snowflake, permissions: keyof typeof Permissions | (keyof typeof Permissions)[], guildId?: Snowflake) {
+        return await this.edit(commandId, { permissions }, guildId)
     }
 
-    public async setGlobal(commandName: string, global: boolean, guildId?: Snowflake) {
-        return await this.edit(commandName, { global }, guildId)
+    public async setGlobal(commandId: Snowflake, global: boolean, guildId?: Snowflake) {
+        return await this.edit(commandId, { global }, guildId)
     }
 
-    private resolveCommandOptionChoices(choices: ApplicationCommandOptionChoiceData[]) {
+    private resolveCommandOptionChoices(choices: ApplicationCommandOptionChoiceData[]): RawApplicationCommandOptionChoiceData[] {
         return choices.map((choice) => {
             return { name: choice.name, name_localizations: choice.nameLocalizations ?? null, value: choice.value }
         }) as unknown as RawApplicationCommandOptionChoiceData[]
@@ -175,19 +185,18 @@ export class ApplicationCommandManager extends CachedManager<string, Application
         return String(bit |= Permissions[permissions] as unknown as number)
     }
 
-    private resolveCommand(command: ApplicationCommandData) {
+    private resolveCommand(command: ApplicationCommandData): RawApplicationCommandData {
         const type = ApplicationCommandTypes[command.type ?? "SLASH_COMMAND"];
         return {
-            id: command.name ?? null,
-            name: command.name ?? null,
+            name: command.name,
             name_localizations: command.nameLocalizations ?? {},
-            description: command.description ? type !== 1 ? null : command.description : null,
+            description: command.description ? command.description : null,
             description_localizations: command.descriptionLocalizations ?? {},
             type,
-            options: command.options ? type !== 1 ? null : this.resolveCommandOptions(command.options) : [],
+            options: command.options ? type !== 1 ? [] : this.resolveCommandOptions(command.options) : [],
             default_member_permissions: command.permissions ? this.resolvePermissions(command.permissions) : "0",
-            dm_permission: command.global ?? false,
-            guild_id: command.guildId ?? null
-        }
+            dm_permission: command.guildId ? false : command.global ?? false,
+            guild_id: command.global ? null : command.guildId ?? null
+        } as any as RawApplicationCommandData
     }
 }
