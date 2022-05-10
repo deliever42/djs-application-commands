@@ -73,8 +73,8 @@ export class ApplicationCommand {
         return command
     }
 
-    public async setName(newName: string) {
-        return await this.edit({ name: newName })
+    public async setName(name: string) {
+        return await this.edit({ name })
     }
 
     public async setNameLocalizations(localizations: { [locale: string]: string }) {
