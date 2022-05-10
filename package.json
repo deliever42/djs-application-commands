@@ -1,15 +1,16 @@
 {
-    "name": "discord.js-new-application-commands",
+    "name": "djs-application-commands",
     "version": "1.0.0",
-    "description": "A module for Discord's new app commands, it can be used with Discord.JS",
-    "main": "dist/index.js",
+    "description": "A module for Discord's new application commands, it can be used with Discord.JS",
+    "main": "dist/src/index.js",
     "scripts": {
         "test": "node dist/test/index.js",
-        "build": "tsc"
+        "build": "tsc",
+        "dev": "npm run build && npm run test"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/deliever42/discord.js-new-application-commands.git"
+        "url": "git+https://github.com/deliever42/djs-application-commands.git"
     },
     "keywords": [
         "discord.js",
@@ -17,16 +18,20 @@
         "ws",
         "api",
         "discord-slash-commands",
-        "discord-application-commands"
+        "discord-application-commands",
+        "slash-commands",
+        "discordapi"
     ],
     "author": "deliever42",
     "license": "GPL-3.0",
     "bugs": {
-        "url": "https://github.com/deliever42/discord.js-new-application-commands/issues"
+        "url": "https://github.com/deliever42/djs-application-commands/issues"
     },
-    "homepage": "https://github.com/deliever42/discord.js-new-application-commands#readme",
+    "homepage": "https://github.com/deliever42/djs-application-commands#readme",
     "dependencies": {
+        "@discordjs/collection": "^0.7.0-dev.1651493036-4ba0f56",
         "@discordjs/rest": "^0.4.1",
+        "@sapphire/snowflake": "^3.2.2",
         "discord.js": "^13.6.0"
     },
     "devDependencies": {
