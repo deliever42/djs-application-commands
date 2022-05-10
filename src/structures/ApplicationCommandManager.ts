@@ -33,7 +33,6 @@ export class ApplicationCommandManager extends CachedManager<Snowflake, Applicat
                     ? v.toString()
                     : v
             ))
-
         })
 
         for (const command of newCommands as any[]) {
@@ -156,7 +155,7 @@ export class ApplicationCommandManager extends CachedManager<Snowflake, Applicat
         return options.map((option) => {
             return {
                 name: option.name,
-                type: ApplicationCommandOptionTypes[option.type],
+                type: typeof option.type === "string" ? ApplicationCommandOptionTypes[option.type] : option.type,
                 name_localizations: option.nameLocalizations ?? {},
                 description: option.description,
                 description_localizations: option.descriptionLocalizations ?? {},
@@ -186,7 +185,7 @@ export class ApplicationCommandManager extends CachedManager<Snowflake, Applicat
     }
 
     private resolveCommand(command: ApplicationCommandData): RawApplicationCommandData {
-        const type = ApplicationCommandTypes[command.type ?? "SLASH_COMMAND"];
+        const type = typeof command.type === "string" ? ApplicationCommandTypes[command.type ?? "SLASH_COMMAND"] : command.type ?? 1
         return {
             name: command.name,
             name_localizations: command.nameLocalizations ?? {},

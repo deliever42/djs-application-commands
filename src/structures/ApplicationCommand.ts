@@ -115,7 +115,7 @@ export class ApplicationCommand {
         return (options as RawApplicationCommandOptionData[]).map((option) => {
             return {
                 name: option.name,
-                type: ApplicationCommandOptionTypes[option.type],
+                type: typeof option.type === "string" ? ApplicationCommandOptionTypes[option.type] : option.type,
                 nameLocalizations: option.name_localizations ?? {},
                 description: option.description,
                 descriptionLocalizations: option.description_localizations ?? {},
