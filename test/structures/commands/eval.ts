@@ -1,22 +1,18 @@
 import type { ExtendedClient } from '../client';
 import type { CommandInteraction } from 'discord.js';
-import type { ApplicationCommandData } from "../../../src/index"
+import { ApplicationCommandBuilder } from "../../../src/index"
 
-export const data: ApplicationCommandData = {
-    name: 'eval',
-    type: "SLASH_COMMAND",
-    global: true,
-    description: "Eval command for bot\'s owner",
-    options: [
-        {
-            name: "code",
-            description: "Code for test",
-            type: "STRING",
-            required: false,
-            channelTypes: ["DM", "GUILD_TEXT"]
-        }
-    ]
-};
+export const data = new ApplicationCommandBuilder()
+    .setName("eval")
+    .setDescription("Eval command for bot\'s owner")
+    .setType("SLASH_COMMAND")
+    .setGlobal(true)
+    .addStringOption((builder) => {
+        return builder
+            .setName("code")
+            .setDescription("Code for test")
+            .setRequired(true)
+    })
 
 export const run = async (client: ExtendedClient, interaction: CommandInteraction) => {
     if (interaction.user.id !== "931957993925378050") {
