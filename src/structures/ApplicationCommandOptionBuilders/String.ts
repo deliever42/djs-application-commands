@@ -24,7 +24,7 @@ export class StringOptionBuilder extends BaseOption {
     }
 
     public addChoice(choice: ApplicationCommandOptionChoiceData) {
-        const resolvedChoice = this.resolveCommandOptionChoice(choice)
+        const resolvedChoice = this.resolveOptionChoice(choice)
 
         this.choices.push(resolvedChoice)
         return this
@@ -38,7 +38,7 @@ export class StringOptionBuilder extends BaseOption {
         return this
     }
 
-    private resolveCommandOptionChoice(choice: ApplicationCommandOptionChoiceData): RawApplicationCommandOptionChoiceData {
+    private resolveOptionChoice(choice: ApplicationCommandOptionChoiceData): RawApplicationCommandOptionChoiceData {
         return { name: choice.name, name_localizations: choice.nameLocalizations ?? null, value: choice.value } as unknown as RawApplicationCommandOptionChoiceData
     }
 }
