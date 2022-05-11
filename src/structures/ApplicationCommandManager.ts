@@ -77,8 +77,6 @@ export class ApplicationCommandManager extends CachedManager<Snowflake, Applicat
         if (!data.description && command?.description) data.description = command.description
         if (!data.type) data.type = command?.type
 
-        console.log(data)
-
         const resolvedData = this.resolveCommand(data as any)
         const newData = await this.rest.patch(route, { body: { ...resolvedData } })
         const applicationCommand = new ApplicationCommand(this.client, newData as any, this)
