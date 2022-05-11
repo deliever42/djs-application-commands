@@ -1,8 +1,8 @@
 import { BaseOption } from "./Base"
-import { SubcommandOptionBuilder } from "../../index"
+import { SubcommandOptionBuilder, type RawApplicationCommandOptionData } from "../../index"
 
 export class SubcommandGroupOptionBuilder extends BaseOption {
-    public options: SubcommandOptionBuilder[]
+    public options: RawApplicationCommandOptionData[]
     public constructor() {
         super("SUB_COMMAND_GROUP")
 
@@ -10,7 +10,7 @@ export class SubcommandGroupOptionBuilder extends BaseOption {
     }
 
     public addSubcommandOption(fn: (builder: SubcommandOptionBuilder) => SubcommandOptionBuilder) {
-        this.options.push(fn(new SubcommandOptionBuilder()))
+        this.options.push(fn(new SubcommandOptionBuilder()) as RawApplicationCommandOptionData)
         return this
     }
 }
