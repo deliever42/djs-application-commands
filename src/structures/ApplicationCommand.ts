@@ -4,7 +4,7 @@ import { DiscordSnowflake } from "@sapphire/snowflake";
 
 export class ApplicationCommand {
     public client: Client
-    public id: string
+    public id: Snowflake
     public name!: string;
     public guildId!: Snowflake | null;
     public applicationId!: Snowflake
