@@ -8,7 +8,7 @@ export class ApplicationCommandBuilder {
     public description_localizations: { [locale: string]: string }
     public name_localizations: { [locale: string]: string }
     public dm_permission: boolean
-    public type: number | null
+    public type: number
     public options: RawApplicationCommandOptionData[]
     public constructor() {
         this.name = null
