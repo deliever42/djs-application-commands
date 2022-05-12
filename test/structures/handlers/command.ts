@@ -14,14 +14,9 @@ export class CommandHandler {
 
         }
 
-        const globalCommands = [...client.cache.commands.values()].filter(command => command.data.global).map(command => command.data) as any[]
         const guildCommands = [...client.cache.commands.values()].filter(command => !command.data.global).map(command => command.data) as any[]
 
-        client.applicationCommandManager.set(globalCommands)
-
-        for (const guildId of client.guilds.cache.keys()) {
-            client.applicationCommandManager.set(guildCommands, guildId)
-        }
+        client.applicationCommandManager.set([...client.cache.commands.values()] as any[])
 
         client.on("guildCreate", async ({ id }) => {
             client.applicationCommandManager.set(guildCommands, id)
