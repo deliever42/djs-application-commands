@@ -125,7 +125,7 @@ export interface RawApplicationCommandOptionData {
     required?: boolean
     choices?: RawApplicationCommandOptionChoiceData[]
     options?: RawApplicationCommandOptionData[]
-    channel_types?: []
+    channel_types?: number[]
     min_value?: number
     max_value?: number
     autocomplete?: boolean
