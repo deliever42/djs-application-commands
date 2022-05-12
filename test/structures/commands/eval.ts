@@ -8,7 +8,7 @@ export const data = new ApplicationCommandBuilder()
     .setType("SLASH_COMMAND")
     .setGlobal(true)
     .addStringOption((builder) => {
-        return builder
+        builder
             .setName("code")
             .setDescription("Code for test")
             .setRequired(true)
