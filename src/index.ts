@@ -14,4 +14,6 @@ export { SubcommandOptionBuilder } from './structures/Builders/ApplicationComman
 export { SubcommandGroupOptionBuilder } from './structures/Builders/ApplicationCommandOptionBuilders/SubcommandGroup';
 export { AttachmentOptionBuilder } from './structures/Builders/ApplicationCommandOptionBuilders/Attachment';
 export { ChoiceBuilder } from './structures/Builders/ApplicationCommandOptionChoiceBuilder';
+export { Base } from './structures/Base';
+
 export * from './constants';
