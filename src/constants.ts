@@ -83,12 +83,6 @@ export interface ApplicationCommandOptionChoiceData {
     value: string | number;
 }
 
-export interface ApplicationCommandOptionChoiceData {
-    name: string;
-    nameLocalizations?: { [locale: string]: string };
-    value: string | number;
-}
-
 export interface ApplicationCommandOptionData {
     name: string;
     type: keyof typeof ApplicationCommandOptionTypes;
