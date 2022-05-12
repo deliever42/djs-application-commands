@@ -16,7 +16,7 @@ export class ChannelOptionBuilder extends BaseOption {
         return this
     }
 
-    public setChannelTypes(channelTypes: ChannelTypes[]) {
+    public setChannelTypes(channelTypes: (keyof typeof ChannelTypes)[]) {
         this.channel_types = channelTypes.map((type) => ChannelTypes[type]) as unknown as number[]
         return this
     }
