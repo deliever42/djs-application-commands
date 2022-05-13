@@ -1,6 +1,6 @@
 {
     "name": "djs-application-commands",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "description": "A module for Discord's new application commands, it can be used with Discord.JS",
     "main": "dist/src/index.js",
     "scripts": {

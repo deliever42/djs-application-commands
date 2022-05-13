@@ -1,4 +1,5 @@
-import { Base, AttachmentOptionBuilder, SubcommandGroupOptionBuilder, UserOptionBuilder, SubcommandOptionBuilder, RoleOptionBuilder, NumberOptionBuilder, BooleanOptionBuilder, ChannelOptionBuilder, IntegerOptionBuilder, MentionableOptionBuilder, Permissions, type Snowflake, type RawApplicationCommandOptionData, ApplicationCommandTypes, StringOptionBuilder } from "../../index"
+import { AttachmentOptionBuilder, SubcommandGroupOptionBuilder, UserOptionBuilder, SubcommandOptionBuilder, RoleOptionBuilder, NumberOptionBuilder, BooleanOptionBuilder, ChannelOptionBuilder, IntegerOptionBuilder, MentionableOptionBuilder, Permissions, type Snowflake, type RawApplicationCommandOptionData, ApplicationCommandTypes, StringOptionBuilder } from "../../index"
+import { Base } from "../Base"
 
 export class ApplicationCommandBuilder extends Base {
     public name: string | null;

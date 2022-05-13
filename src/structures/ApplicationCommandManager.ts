@@ -3,6 +3,7 @@ import { type RawApplicationCommandData, Permissions, type Snowflake, type RawAp
 import { REST } from "@discordjs/rest"
 import { Base } from "./Base"
 import { ApplyMixins } from "./Utils/ApplyMixins"
+import { ApplicationCommandBuilder } from "./Builders/ApplicationCommandBuilder"
 
 declare module "discord.js" {
     interface CachedManager<K, Holds, R = null> {
@@ -28,6 +29,7 @@ class ApplicationCommandManager extends CachedManager<Snowflake, ApplicationComm
 
         for (const command of commands) {
             if (!command.guildId && !command.global) command.guildId = guildId
+
             resolvedCommands.push(this.resolveCommand(command))
         }
 
@@ -189,6 +191,9 @@ class ApplicationCommandManager extends CachedManager<Snowflake, ApplicationComm
     }
 
     private resolveCommand(command: ApplicationCommandData): RawApplicationCommandData {
+        if (command instanceof ApplicationCommandBuilder)
+            return command
+
         const type = typeof command.type === "string" ? ApplicationCommandTypes[command.type ?? "SLASH_COMMAND"] : command.type ?? 1
         return {
             name: command.name,

@@ -1,5 +1,5 @@
 import { BaseOptionBuilder } from "./Base"
-import type { ApplicationCommandOptionChoiceData, RawApplicationCommandOptionChoiceData } from "../../../index"
+import type { RawApplicationCommandOptionChoiceData } from "../../../index"
 import { ChoiceBuilder } from "../ApplicationCommandOptionChoiceBuilder"
 
 export class NumberOptionBuilder extends BaseOptionBuilder {

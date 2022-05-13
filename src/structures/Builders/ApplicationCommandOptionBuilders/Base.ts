@@ -1,4 +1,5 @@
-import { ApplicationCommandOptionTypes, Base } from "../../../index"
+import { ApplicationCommandOptionTypes } from "../../../index"
+import { Base } from "../../Base"
 
 export class BaseOptionBuilder extends Base {
     public name: string | null

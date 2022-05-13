@@ -1,4 +1,4 @@
-import { Base } from "../../index"
+import { Base } from "../Base"
 
 export class ChoiceBuilder extends Base {
     public name: string | null;
