@@ -20,7 +20,8 @@
         "discord-slash-commands",
         "discord-application-commands",
         "slash-commands",
-        "discordapi"
+        "discordapi",
+        "djs"
     ],
     "author": "deliever42",
     "license": "GPL-3.0",
@@ -29,7 +30,7 @@
     },
     "homepage": "https://github.com/deliever42/djs-application-commands#readme",
     "dependencies": {
-        "@discordjs/collection": "^0.7.0-dev.1651493036-4ba0f56",
+        "@discordjs/collection": "^0.6.0",
         "@discordjs/rest": "^0.4.1",
         "@sapphire/snowflake": "^3.2.2",
         "discord.js": "^13.6.0"
