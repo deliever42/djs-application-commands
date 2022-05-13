@@ -4,3 +4,4 @@ node_modules
 dist/test
 test
 src
+tsconfig.json
